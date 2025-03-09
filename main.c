@@ -22,13 +22,13 @@ int main() {
 
     struct game game = {.board = {{'A', ' ', ' ', ' '},
                                   {'B', ' ', ' ', 'B'},
-                                  {'C', 'C', 'C', ' '},
+                                  {'D', 'C', 'C', ' '},
                                   {'D', 'D', 'D', 'D'}},
                         .score = 0};
 
     render(game);
     bool quit = false;
-    while (!quit) {
+    while (!is_game_won(game) && !quit) {
         int ch = getch();
 
         switch (ch) {

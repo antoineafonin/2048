@@ -6,10 +6,6 @@
 
 void change_score(struct game *game, int row, int col);
 char change_letter(char letter);
-void move_tile_down(struct game *game, int dx, int row, int col);
-void move_tile_up(struct game *game, int dx, int row, int col);
-void move_tile_left(struct game *game, int dx, int row, int col);
-void move_tile_right(struct game *game, int dx, int row, int col);
 bool is_next_letter(const struct game *game, int row, int col);
 
 bool update(struct game *game, int dy, int dx) {
@@ -17,27 +13,117 @@ bool update(struct game *game, int dy, int dx) {
     if (dy == 0 && dx == 0) return false;
     if (dx != 0 && dy != 0) return false;
 
-    for (int row = 0; row < SIZE; row++) {
+    bool moved = false;
+
+    bool merged[SIZE][SIZE] = {{false}};
+
+    if (dx == 1) {  // move right
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = SIZE - 2; col >= 0; col--) {
+                if (game->board[row][col] != ' ') {
+                    int next_col = col;
+                    while (next_col < SIZE - 1 &&
+                           game->board[row][next_col + 1] == ' ') {
+                        game->board[row][next_col + 1] =
+                            game->board[row][next_col];
+                        game->board[row][next_col] = ' ';
+                        next_col++;
+                        moved = true;
+                    }
+                    if (next_col < SIZE - 1 &&
+                        game->board[row][next_col + 1] ==
+                            game->board[row][next_col] &&
+                        !merged[row][next_col + 1]) {
+                        game->board[row][next_col + 1] =
+                            change_letter(game->board[row][next_col]);
+                        game->board[row][next_col] = ' ';
+                        merged[row][next_col + 1] = true;
+                        moved = true;
+                    }
+                }
+            }
+        }
+    } else if (dx == -1) {  // move left
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 1; col < SIZE; col++) {
+                if (game->board[row][col] != ' ') {
+                    int next_col = col;
+                    while (next_col > 0 &&
+                           game->board[row][next_col - 1] == ' ') {
+                        game->board[row][next_col - 1] =
+                            game->board[row][next_col];
+                        game->board[row][next_col] = ' ';
+                        next_col--;
+                        moved = true;
+                    }
+                    if (next_col > 0 &&
+                        game->board[row][next_col - 1] ==
+                            game->board[row][next_col] &&
+                        !merged[row][next_col - 1]) {
+                        game->board[row][next_col - 1] =
+                            change_letter(game->board[row][next_col]);
+                        game->board[row][next_col] = ' ';
+                        merged[row][next_col - 1] = true;
+                        moved = true;
+                    }
+                }
+            }
+        }
+    } else if (dy == 1) {  // move down
         for (int col = 0; col < SIZE; col++) {
-            if (dx == 1) {
-                move_tile_right(game, dx, row, col);
-                return true;
+            for (int row = SIZE - 2; row >= 0; row--) {
+                if (game->board[row][col] != ' ') {
+                    int next_row = row;
+                    while (next_row < SIZE - 1 &&
+                           game->board[next_row + 1][col] == ' ') {
+                        game->board[next_row + 1][col] =
+                            game->board[next_row][col];
+                        game->board[next_row][col] = ' ';
+                        next_row++;
+                        moved = true;
+                    }
+                    if (next_row < SIZE - 1 &&
+                        game->board[next_row + 1][col] ==
+                            game->board[next_row][col] &&
+                        !merged[next_row + 1][col]) {
+                        game->board[next_row + 1][col] =
+                            change_letter(game->board[next_row][col]);
+                        game->board[next_row][col] = ' ';
+                        merged[next_row + 1][col] = true;
+                        moved = true;
+                    }
+                }
             }
-            if (dx == -1) {
-                move_tile_left(game, dx, row, col);
-                return true;
-            }
-            if (dy == 1) {
-                move_tile_down(game, dx, row, col);
-                return true;
-            }
-            if (dy == -1) {
-                move_tile_up(game, dx, row, col);
-                return true;
+        }
+    } else if (dy == -1) {  // move up
+        for (int col = 0; col < SIZE; col++) {
+            for (int row = 1; row < SIZE; row++) {
+                if (game->board[row][col] != ' ') {
+                    int next_row = row;
+                    while (next_row > 0 &&
+                           game->board[next_row - 1][col] == ' ') {
+                        game->board[next_row - 1][col] =
+                            game->board[next_row][col];
+                        game->board[next_row][col] = ' ';
+                        next_row--;
+                        moved = true;
+                    }
+                    if (next_row > 0 &&
+                        game->board[next_row - 1][col] ==
+                            game->board[next_row][col] &&
+                        !merged[next_row - 1][col]) {
+                        game->board[next_row - 1][col] =
+                            change_letter(game->board[next_row][col]);
+                        game->board[next_row][col] = ' ';
+                        merged[next_row - 1][col] = true;
+                        moved = true;
+                    }
+                }
             }
         }
     }
-    return false;
+
+    return moved;
 }
 
 bool is_game_won(const struct game game) {
