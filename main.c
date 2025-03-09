@@ -1,17 +1,18 @@
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
 #include <curses.h>
+#include <stdbool.h>
 
 #include "k.h"
 #include "ui.h"
 
 int main() {
-    initscr();            
-    start_color();        
-    use_default_colors(); 
+    initscr();
+    start_color();
+    use_default_colors();
+    keypad(stdscr, TRUE);
+    noecho();
+    curs_set(0);
 
-    init_pair(0, -1, -1); 
+    init_pair(0, -1, -1);
     init_pair(1, COLOR_RED, -1);
     init_pair(2, COLOR_GREEN, -1);
     init_pair(3, COLOR_YELLOW, -1);
@@ -25,11 +26,34 @@ int main() {
                                   {'D', 'D', 'D', 'D'}},
                         .score = 0};
 
-    bool result = update(&game, 0, 1);
     render(game);
-    printf("%d\n", result);
+    bool quit = false;
+    while (!quit) {
+        int ch = getch();
 
-    getch(); 
-    endwin(); 
+        switch (ch) {
+            case KEY_UP:
+                update(&game, -1, 0);
+                break;
+            case KEY_DOWN:
+                update(&game, 1, 0);
+                break;
+            case KEY_LEFT:
+                update(&game, 0, -1);
+                break;
+            case KEY_RIGHT:
+                update(&game, 0, 1);
+                break;
+            case 'q':
+            case 'Q':
+                quit = true;
+                break;
+            default:
+                break;
+        }
+        render(game);
+    }
+
+    endwin();
     return 0;
 }
