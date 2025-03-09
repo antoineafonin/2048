@@ -162,38 +162,6 @@ bool is_move_possible(const struct game game) {
     return false;
 }
 
-void move_tile_right(struct game *game, int dx, int row, int col) {
-    while (col < SIZE - 1 && game->board[row][col + 1] == ' ') {
-        game->board[row][col + 1] = game->board[row][col];
-        game->board[row][col] = ' ';
-        col++;
-    }
-}
-
-void move_tile_left(struct game *game, int dx, int row, int col) {
-    while (col > 0 && game->board[row][col - 1] == ' ') {
-        game->board[row][col - 1] = game->board[row][col];
-        game->board[row][col] = ' ';
-        col--;
-    }
-}
-
-void move_tile_up(struct game *game, int dx, int row, int col) {
-    while (row > 0 && game->board[row - 1][col] == ' ') {
-        game->board[row - 1][col] = game->board[row][col];
-        game->board[row][col] = ' ';
-        row--;
-    }
-}
-
-void move_tile_down(struct game *game, int dx, int row, int col) {
-    while (row < SIZE - 1 && game->board[row + 1][col] == ' ') {
-        game->board[row + 1][col] = game->board[row][col];
-        game->board[row][col] = ' ';
-        row++;
-    }
-}
-
 bool is_next_letter(const struct game *game, int row, int col) {
     return (game->board[row][col] >= 'A' && game->board[row][col] <= 'Z') ||
            (game->board[row][col] >= 'a' && game->board[row][col] <= 'z');
