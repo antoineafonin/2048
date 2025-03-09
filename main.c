@@ -1,38 +1,34 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "k.h"
+#include "ui.h"
 
 int main() {
-    struct game game = {.board = {{'A', 'B', 'C', 'D'},
-                                  {'E', 'F', 'G', 'H'},
-                                  {'I', 'J', 'K', 'A'},
-                                  {'B', 'C', 'D', 'E'}},
+    // move right
+    struct game game = {.board = {{'A', ' ', ' ', ' '},
+                                  {'B', ' ', ' ', 'B'},
+                                  {'C', 'C', 'C', ' '},
+                                  {'D', 'D', 'D', 'D'}},
                         .score = 0};
 
-    printf("is won: %d\n", is_game_won(game));
-
-    struct game game1 = {.board = {{'A', 'A', 'C', 'D'},
-                                   {'A', 'F', 'G', 'H'},
-                                   {'I', 'J', 'J', 'A'},
-                                   {'B', 'C', 'D', 'E'}},
-                         .score = 0};
-
-    printf("is move possible: %d\n", is_move_possible(game1));
-    // stdout: 1
-
-    struct game gam2 = {
+    bool result = update(&game, 0, 1);
+    /*
+    game = {
         .board = {
-            {'A', 'B', 'C', 'D'},
-            {'E', 'F', 'G', 'H'},
-            {'I', 'J', 'K', 'A'},
-            {'B', 'C', 'D', 'E'}
+            {' ', ' ', ' ', 'A'},
+            {' ', ' ', ' ', 'C'},
+            {' ', ' ', 'C', 'D'},
+            {' ', ' ', 'E', 'E'}
         },
-        .score = 0
+        .score = 88
     };
-    
-    printf("is move possible: %d\n", is_move_possible(gam2));
-    // stdout: 0
+    result = true;
+    */
 
+    render(game);
+
+    printf("%d\n", result);
     return 0;
 }
