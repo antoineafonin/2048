@@ -22,9 +22,15 @@ int main() {
 
     struct game game = {.board = {{'A', ' ', ' ', ' '},
                                   {'B', ' ', ' ', 'B'},
-                                  {'D', 'C', 'C', ' '},
+                                  {'C', 'C', 'C', ' '},
                                   {'D', 'D', 'D', 'D'}},
                         .score = 0};
+
+    add_random_tile(&game);
+    update(&game, 0, 1);
+
+    is_game_won(game);
+    is_move_possible(game);
 
     render(game);
     bool quit = false;

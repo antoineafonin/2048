@@ -28,7 +28,6 @@ bool update(struct game *game, int dy, int dx) {
     if (dx != 0 && dy != 0) return false;
 
     bool moved = false;
-
     bool merged[SIZE][SIZE] = {{false}};
 
     if (dx == 1) {  // move right
@@ -53,6 +52,7 @@ bool update(struct game *game, int dy, int dx) {
                         game->board[row][next_col] = ' ';
                         merged[row][next_col + 1] = true;
                         moved = true;
+                        change_score(game, row, next_col + 1);
                     }
                 }
             }
@@ -79,6 +79,7 @@ bool update(struct game *game, int dy, int dx) {
                         game->board[row][next_col] = ' ';
                         merged[row][next_col - 1] = true;
                         moved = true;
+                        change_score(game, row, next_col - 1);
                     }
                 }
             }
@@ -105,6 +106,7 @@ bool update(struct game *game, int dy, int dx) {
                         game->board[next_row][col] = ' ';
                         merged[next_row + 1][col] = true;
                         moved = true;
+                        change_score(game, next_row + 1, col);
                     }
                 }
             }
@@ -131,10 +133,19 @@ bool update(struct game *game, int dy, int dx) {
                         game->board[next_row][col] = ' ';
                         merged[next_row - 1][col] = true;
                         moved = true;
+                        change_score(game, next_row - 1, col);
                     }
                 }
             }
         }
+    }
+
+    if (is_game_won(*game)) {
+        return true;
+    }
+
+    if (moved) {
+        add_random_tile(game);  // Add a new random tile when board changes
     }
 
     return moved;
@@ -155,36 +166,32 @@ bool is_move_possible(const struct game game) {
     for (int row = 0; row < SIZE; row++) {
         for (int col = 0; col < SIZE; col++) {
             char letter = game.board[row][col];
-
-            if (row % 2 != col % 2) continue;
             if (game.board[row][col] == ' ') return true;
 
-            if (row < SIZE - 1 && letter == game.board[row + 1][col]) {
+            if (row % 2 != col % 2) continue;
+
+            if (row < SIZE - 1 && letter == game.board[row + 1][col])
                 return true;
-            }
-            if (row >= 1 && letter == game.board[row - 1][col]) {
+            if (row >= 1 && letter == game.board[row - 1][col]) return true;
+            if (col < SIZE - 1 && letter == game.board[row][col + 1])
                 return true;
-            }
-            if (col < SIZE - 1 && letter == game.board[row][col + 1]) {
-                return true;
-            }
-            if (col >= 1 && letter == game.board[row][col - 1]) {
-                return true;
-            }
+            if (col >= 1 && letter == game.board[row][col - 1]) return true;
         }
     }
     return false;
 }
 
-bool is_next_letter(const struct game *game, int row, int col) {
-    return (game->board[row][col] >= 'A' && game->board[row][col] <= 'Z') ||
-           (game->board[row][col] >= 'a' && game->board[row][col] <= 'z');
+char change_letter(char letter) {
+    if (letter >= 'A' && letter < 'K') {
+        return letter + 1;
+    }
+    return letter;
 }
 
 void change_score(struct game *game, int row, int col) {
-    game->score += pow(2, game->board[row][col] - 'A' + 1);
-}
-
-char change_letter(char letter) {
-    return (letter == 'Z' || letter == 'z') ? 'A' : letter + 1;
+    char letter = game->board[row][col];
+    if (letter >= 'A' && letter <= 'K') {
+        int value = 1 << (letter - 'A' + 1);
+        game->score += value;
+    }
 }
