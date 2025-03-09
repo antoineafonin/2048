@@ -8,6 +8,20 @@ void change_score(struct game *game, int row, int col);
 char change_letter(char letter);
 bool is_next_letter(const struct game *game, int row, int col);
 
+void add_random_tile(struct game *game) {
+    int row, col;
+    do {
+        row = rand() % SIZE;
+        col = rand() % SIZE;
+    } while (game->board[row][col] != ' ');
+
+    if (rand() % 2 == 0) {
+        game->board[row][col] = 'A';
+    } else {
+        game->board[row][col] = 'B';
+    }
+}
+
 bool update(struct game *game, int dy, int dx) {
     if (dy > 1 || dy < -1 || dx > 1 || dx < -1) return false;
     if (dy == 0 && dx == 0) return false;
