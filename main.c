@@ -1,5 +1,7 @@
 #include <curses.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "k.h"
 #include "ui.h"
@@ -20,35 +22,35 @@ int main() {
     init_pair(5, COLOR_MAGENTA, -1);
     init_pair(6, COLOR_CYAN, -1);
 
-    struct game game = {.board = {{'A', ' ', ' ', ' '},
-                                  {'B', ' ', ' ', 'B'},
-                                  {'C', 'C', 'C', ' '},
-                                  {'D', 'D', 'D', 'D'}},
+    struct game game = {.board = {{' ', ' ', ' ', ' '},
+                                  {' ', ' ', ' ', ' '},
+                                  {' ', ' ', ' ', ' '},
+                                  {' ', ' ', ' ', ' '}},
                         .score = 0};
 
     add_random_tile(&game);
-    update(&game, 0, 1);
-
-    is_game_won(game);
-    is_move_possible(game);
+    add_random_tile(&game);
 
     render(game);
+
     bool quit = false;
     while (!is_game_won(game) && !quit) {
         int ch = getch();
 
+        bool moved = false;
+
         switch (ch) {
             case KEY_UP:
-                update(&game, -1, 0);
+                moved = update(&game, -1, 0);
                 break;
             case KEY_DOWN:
-                update(&game, 1, 0);
+                moved = update(&game, 1, 0);
                 break;
             case KEY_LEFT:
-                update(&game, 0, -1);
+                moved = update(&game, 0, -1);
                 break;
             case KEY_RIGHT:
-                update(&game, 0, 1);
+                moved = update(&game, 0, 1);
                 break;
             case 'q':
             case 'Q':
@@ -57,6 +59,18 @@ int main() {
             default:
                 break;
         }
+
+        if (moved) {
+            add_random_tile(&game);
+        }
+
+        if (!is_move_possible(game)) {
+            quit = true;
+            mvprintw(LINES / 2, COLS / 2 - 5, "Game Over!");
+            refresh();
+            getch();
+        }
+
         render(game);
     }
 
