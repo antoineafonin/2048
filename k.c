@@ -6,7 +6,8 @@
 
 void change_score(struct game *game, int row, int col);
 char change_letter(char letter);
-bool is_next_letter(const struct game *game, int row, int col);
+bool is_game_won(const struct game game);
+bool is_move_possible(const struct game game);
 
 void add_random_tile(struct game *game) {
     int row, col;
@@ -118,9 +119,8 @@ bool update(struct game *game, int dy, int dx) {
                     int next_row = row;
                     while (next_row > 0 &&
                            game->board[next_row - 1][col] == ' ') {
-                        game->board[next_row - 1][col] =
-                            game->board[next_row][col];
-                        game->board[next_row][col] = ' ';
+                        game->board[next_row - 1][col] = game->board[row][col];
+                        game->board[row][col] = ' ';
                         next_row--;
                         moved = true;
                     }
@@ -145,10 +145,25 @@ bool update(struct game *game, int dy, int dx) {
     }
 
     if (moved) {
-        add_random_tile(game);  // Add a new random tile when board changes
+        add_random_tile(game);
     }
 
     return moved;
+}
+
+char change_letter(char letter) {
+    if (letter >= 'A' && letter < 'K') {
+        return letter + 1;
+    }
+    return letter;
+}
+
+void change_score(struct game *game, int row, int col) {
+    char letter = game->board[row][col];
+    if (letter >= 'A' && letter <= 'K') {
+        int value = 1 << (letter - 'A' + 1);
+        game->score += value;
+    }
 }
 
 bool is_game_won(const struct game game) {
@@ -179,19 +194,4 @@ bool is_move_possible(const struct game game) {
         }
     }
     return false;
-}
-
-char change_letter(char letter) {
-    if (letter >= 'A' && letter < 'K') {
-        return letter + 1;
-    }
-    return letter;
-}
-
-void change_score(struct game *game, int row, int col) {
-    char letter = game->board[row][col];
-    if (letter >= 'A' && letter <= 'K') {
-        int value = 1 << (letter - 'A' + 1);
-        game->score += value;
-    }
 }
