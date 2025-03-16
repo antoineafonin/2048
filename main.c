@@ -5,6 +5,7 @@
 
 #include "k.h"
 #include "ui.h"
+#include "hof.h"
 
 int main() {
     initscr();
@@ -21,6 +22,15 @@ int main() {
     init_pair(4, COLOR_BLUE, -1);
     init_pair(5, COLOR_MAGENTA, -1);
     init_pair(6, COLOR_CYAN, -1);
+
+    struct player list[10];
+    struct player player = {
+        .name = "player",
+        .score = 1500
+    };
+    int size = load(list);
+    add_player(list, &size, player);
+    save(list, size);
 
     struct game game = {.board = {{' ', ' ', ' ', ' '},
                                   {' ', ' ', ' ', ' '},

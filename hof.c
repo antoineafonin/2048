@@ -41,4 +41,30 @@ bool save(const struct player list[], const int size) {
     return true;
 }
 
-bool add_player(struct player list[], int* size, const struct player player) {}
+bool add_player(struct player list[], int* size, const struct player player) {
+    int pos = 0;
+
+    while (pos < *size && list[pos].score > player.score) {
+        pos++;
+    }
+
+    while (pos < *size && list[pos].score == player.score) {
+        pos++;
+    }
+
+    if (*size == 10 && pos == 10) {
+        return false;
+    }
+
+    if (*size < 10) {
+        (*size)++;
+    }
+
+    for (int i = *size - 1; i > pos; i--) {
+        list[i] = list[i - 1];
+    }
+
+    list[pos] = player;
+
+    return true;
+}
