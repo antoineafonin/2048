@@ -1,29 +1,31 @@
 #include "hof.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_PLAYERS 10
 
 int load(struct player list[]) {
     FILE* hf = fopen(HOF_FILE, "r");
-    if (NULL == hf) return -1;
+    if (hf == NULL) return -1;
 
-    int get_res;
-    struct player player;
     int size = 0;
+    struct player player;
 
-    while (size < MAX_PLAYERS &&
-           (get_res = fscanf(hf, "%s %d", player.name, &player.score)) != EOF) {
-        if (get_res != 2) {
+    while (size < MAX_PLAYERS) {
+        int get_res = fscanf(hf, "%31s %d", player.name, &player.score);
+
+        if (get_res == 2) {
+            add_player(list, &size, player);
+        } else if (get_res == EOF) {
+            break;
+        } else {
             fclose(hf);
             return -1;
         }
-
-        add_player(list, &size, player);
     }
 
     fclose(hf);
-
     return size;
 }
 
@@ -42,18 +44,21 @@ bool save(const struct player list[], const int size) {
 }
 
 bool add_player(struct player list[], int* size, const struct player player) {
+    if (*size == 10 && list[9].score > player.score) {
+        return false;
+    }
+
     int pos = 0;
 
-    while (pos < *size && list[pos].score > player.score) {
+    while (pos < *size) {
+        if (list[pos].score < player.score) {
+            break;
+        } else if (list[pos].score == player.score) {
+            if (strcmp(player.name, list[pos].name) < 0) {
+                break;
+            }
+        }
         pos++;
-    }
-
-    while (pos < *size && list[pos].score == player.score) {
-        pos++;
-    }
-
-    if (*size == 10 && pos == 10) {
-        return false;
     }
 
     if (*size < 10) {
@@ -68,3 +73,4 @@ bool add_player(struct player list[], int* size, const struct player player) {
 
     return true;
 }
+
